@@ -1,4 +1,9 @@
 import os
+import sys
+
+# Add the 'api' directory to the Python path so Vercel can find our local modules
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 from flask import Flask
 from routes import register_routes
 
