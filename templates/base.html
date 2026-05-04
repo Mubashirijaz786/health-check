@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Helper App</title>
+    <!-- Link to the CSS file -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Health Helper App</h1>
+        <nav>
+            <a href="{{ url_for('index') }}">Medicine Reminder</a>
+            <a href="{{ url_for('fever_checker') }}">Fever Risk Checker</a>
+        </nav>
+    </header>
+
+    <main>
+        <!-- This block displays any flash messages passed from Python -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- This is where the content from other templates will be injected -->
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

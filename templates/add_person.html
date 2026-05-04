@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card">
+    <h2>Add Person & Medicines</h2>
+    <form id="personForm">
+        <div class="form-group">
+            <label>Person Name:</label>
+            <input type="text" id="person_name" required placeholder="e.g. John Doe">
+        </div>
+        
+        <hr style="margin: 20px 0; border: 1px solid #eee;">
+        <h3>Medicines</h3>
+        
+        <div id="medicines-container">
+            <!-- Medicine blocks will be injected here by JS -->
+        </div>
+        
+        <button type="button" onclick="addMedicineBlock()" style="background:#3498db; margin-bottom:20px; font-size: 0.9rem;">+ Add Another Medicine</button>
+        <br>
+        
+        <div style="display: flex; gap: 10px;">
+            <button type="button" onclick="submitForm()" style="background:#2ecc71;">Save Person</button>
+            <a href="{{ url_for('index') }}" class="btn-edit" style="background:#95a5a6; padding: 12px 20px;">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<script>
+let medCount = 0;
+
+function addMedicineBlock() {
+    medCount++;
+    const container = document.getElementById('medicines-container');
+    const div = document.createElement('div');
+    div.className = 'card';
+    div.style.background = '#f9f9f9';
+    div.style.boxShadow = 'none';
+    div.style.border = '1px solid #ccc';
+    div.innerHTML = `
+        <h4 style="margin-bottom:15px; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Medicine ${medCount} 
+            <button type="button" onclick="this.parentElement.parentElement.remove()" style="float:right; background:#e74c3c; padding:2px 8px; font-size:0.8rem; border-radius: 4px;">Remove</button>
+        </h4>
+        <div class="form-group">
+            <label>Medicine Name:</label>
+            <input type="text" class="med-name" required placeholder="e.g. Paracetamol">
+        </div>
+        <div class="form-group">
+            <label>Dosage:</label>
+            <input type="text" class="med-dosage" required placeholder="e.g. 1 pill, 500mg">
+        </div>
+        <div class="form-group">
+            <label>Total Days to Use:</label>
+            <input type="number" class="med-days" required placeholder="e.g. 5" min="1" value="7">
+        </div>
+        <div class="form-group">
+            <label>How many times a day?</label>
+            <select class="med-times-count" onchange="updateTimeInputs(this)" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                <option value="1">1 Time a day</option>
+                <option value="2">2 Times a day</option>
+                <option value="3">3 Times a day</option>
+                <option value="4">4 Times a day</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Reminder Times:</label>
+            <div class="time-inputs-container" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <input type="time" class="med-time" required style="width: auto;">
+            </div>
+        </div>
+    `;
+    container.appendChild(div);
+}
+
+function updateTimeInputs(selectElement) {
+    const count = parseInt(selectElement.value);
+    const container = selectElement.parentElement.nextElementSibling.querySelector('.time-inputs-container');
+    container.innerHTML = '';
+    for(let i=0; i<count; i++) {
+        container.innerHTML += `<input type="time" class="med-time" required style="width: auto;">`;
+    }
+}
+
+function submitForm() {
+    const person_name = document.getElementById('person_name').value;
+    if(!person_name) {
+        alert("Please enter a person's name.");
+        return;
+    }
+    
+    const medicines = [];
+    const medBlocks = document.querySelectorAll('#medicines-container > div');
+    
+    for(let block of medBlocks) {
+        const name = block.querySelector('.med-name').value;
+        const dosage = block.querySelector('.med-dosage').value;
+        const total_days = block.querySelector('.med-days').value;
+        
+        const times = [];
+        block.querySelectorAll('.med-time').forEach(input => {
+            if(input.value) times.push(input.value);
+        });
+        
+        if(!name || !dosage || !total_days || times.length === 0) {
+            alert("Please fill out all fields for all medicines.");
+            return;
+        }
+        
+        medicines.push({
+            name, dosage, total_days: parseInt(total_days), times
+        });
+    }
+    
+    if(medicines.length === 0) {
+        alert("Please add at least one medicine.");
+        return;
+    }
+    
+    // Send data to server using Fetch API
+    fetch("{{ url_for('add_person') }}", {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ person_name, medicines })
+    }).then(res => res.json()).then(data => {
+        if(data.success) {
+            window.location.href = '/';
+        }
+    }).catch(err => {
+        console.error("Error submitting form", err);
+        alert("An error occurred. Please try again.");
+    });
+}
+
+// Add one medicine block by default when page loads
+window.onload = () => {
+    addMedicineBlock();
+};
+</script>
+{% endblock %}

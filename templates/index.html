@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 style="margin: 0; border: none; padding: 0;">Your Health Reminders</h2>
+        <a href="{{ url_for('add_person') }}" class="btn-edit" style="background:#2ecc71;">+ Add New Person & Medicines</a>
+    </div>
+    
+    {% if data.persons %}
+        {% for person in data.persons %}
+            <div class="person-block" style="border: 2px solid #3498db; border-radius: 8px; margin-bottom: 20px; padding: 15px; background: #fff;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+                    <h3 style="color: #2c3e50; margin: 0;">🧑 {{ person.name }}</h3>
+                    <div class="btn-group">
+                        <a href="{{ url_for('add_medicine_to_person', person_id=person.id) }}" class="btn-edit" style="background:#3498db;">+ Add Med</a>
+                        <form action="{{ url_for('delete_person', person_id=person.id) }}" method="POST" style="display:inline;">
+                            <button type="submit" class="btn-delete" onclick="return confirm('Delete {{ person.name }} and all their medicines?');">Delete Person</button>
+                        </form>
+                    </div>
+                </div>
+                
+                {% if person.medicines %}
+                    <ul class="medicine-list">
+                    {% for med in person.medicines %}
+                        <li class="medicine-item">
+                            <div>
+                                <strong>{{ med.name }}</strong> <br>
+                                <small>Dosage: {{ med.dosage }} | For {{ med.total_days }} days (Started: {{ med.start_date }})</small>
+                            </div>
+                            <div class="actions">
+                                <div class="time" style="margin-bottom: 5px;">
+                                    {% for t in med.times %}
+                                        <span style="background:#e8f4f8; padding:3px 6px; border-radius:4px; font-size:0.9rem; margin-left: 4px; display: inline-block;">🕰️ {{ t }}</span>
+                                    {% endfor %}
+                                </div>
+                                <div class="btn-group">
+                                    <a href="{{ url_for('edit_medicine', person_id=person.id, medicine_id=med.id) }}" class="btn-edit">Edit</a>
+                                    <form action="{{ url_for('delete_medicine', person_id=person.id, medicine_id=med.id) }}" method="POST" style="display:inline;">
+                                        <button type="submit" class="btn-delete" onclick="return confirm('Delete this medicine?');">Delete</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </li>
+                    {% endfor %}
+                    </ul>
+                {% else %}
+                    <p style="color: #7f8c8d; font-style: italic;">No medicines assigned to this person yet.</p>
+                {% endif %}
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No records found. Click the button above to add someone and get started!</p>
+    {% endif %}
+</div>
+
+<!-- Custom Notification Modal -->
+<div id="alarmModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 9999; justify-content: center; align-items: center;">
+    <div style="background: white; padding: 30px; border-radius: 10px; max-width: 500px; width: 90%; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+        <h2 style="color: #e74c3c; margin-bottom: 20px;">⏰ Reminder!</h2>
+        <div id="alarmMessage" style="font-size: 1.2rem; margin-bottom: 30px; color: #2c3e50; white-space: pre-wrap;"></div>
+        <button onclick="document.getElementById('alarmModal').style.display='none'" style="background: #3498db; padding: 12px 25px; font-size: 1.1rem; border: none; border-radius: 5px; color: white; cursor: pointer; font-weight: bold;">Got it, thanks!</button>
+    </div>
+</div>
+
+<script>
+    // A function to play a long alarm tone
+    function playAlarm() {
+        try {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            
+            // Play 5 beeps over 2.5 seconds
+            for (let i = 0; i < 5; i++) {
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                
+                oscillator.type = 'square';
+                // Higher pitch alarm sound
+                oscillator.frequency.setValueAtTime(880, audioCtx.currentTime + (i * 0.5));
+                
+                // Volume envelope
+                gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime + (i * 0.5));
+                gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + (i * 0.5) + 0.3);
+                
+                oscillator.start(audioCtx.currentTime + (i * 0.5));
+                oscillator.stop(audioCtx.currentTime + (i * 0.5) + 0.4);
+            }
+        } catch (e) {
+            console.error("Audio playback failed", e);
+        }
+    }
+
+    // Prepare a list of all reminders
+    const medicineReminders = [
+        {% for person in data.persons %}
+            {% for med in person.medicines %}
+                {% for t in med.times %}
+                    { time: "{{ t }}", message: "It's time for {{ person.name }} to take {{ med.name }} ({{ med.dosage }})" },
+                {% endfor %}
+            {% endfor %}
+        {% endfor %}
+    ];
+    
+    // Check every second to trigger right on time
+    let lastPlayedTime = null;
+    setInterval(() => {
+        const now = new Date();
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const currentTime = `${hours}:${minutes}`;
+        
+        // Find all medicines that need to be taken right now
+        const dueReminders = medicineReminders.filter(r => r.time === currentTime);
+        
+        if (dueReminders.length > 0 && lastPlayedTime !== currentTime) {
+            lastPlayedTime = currentTime; // Prevent multiple triggers in the same minute
+            
+            playAlarm();
+            
+            // Combine messages if multiple medicines are due
+            const alertMsg = dueReminders.map(r => "• " + r.message).join("\n");
+            
+            // Show the custom modal slightly after sound starts
+            setTimeout(() => {
+                document.getElementById('alarmMessage').innerText = alertMsg;
+                document.getElementById('alarmModal').style.display = 'flex';
+            }, 100);
+        }
+    }, 1000);
+</script>
+{% endblock %}

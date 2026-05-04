@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card">
+    <h2>Add Medicine for {{ person.name }}</h2>
+    
+    <form action="{{ url_for('add_medicine_to_person', person_id=person.id) }}" method="POST">
+        <div class="form-group">
+            <label for="name">Medicine Name:</label>
+            <input type="text" id="name" name="name" required placeholder="e.g. Paracetamol">
+        </div>
+        
+        <div class="form-group">
+            <label for="dosage">Dosage:</label>
+            <input type="text" id="dosage" name="dosage" required placeholder="e.g. 1 pill, 500mg">
+        </div>
+
+        <div class="form-group">
+            <label for="total_days">Total Days to Use:</label>
+            <input type="number" id="total_days" name="total_days" required placeholder="e.g. 5" min="1" value="7">
+        </div>
+        
+        <div class="form-group">
+            <label>How many times a day?</label>
+            <select id="times_count" onchange="updateTimes()" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                <option value="1">1 Time a day</option>
+                <option value="2">2 Times a day</option>
+                <option value="3">3 Times a day</option>
+                <option value="4">4 Times a day</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Reminder Times:</label>
+            <div id="times_container" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <input type="time" name="time_0" required style="width: auto;">
+            </div>
+        </div>
+        
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <button type="submit" style="background:#2ecc71;">Add Medicine</button>
+            <a href="{{ url_for('index') }}" class="btn-edit" style="background: #95a5a6; padding: 12px 20px;">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<script>
+function updateTimes() {
+    const count = parseInt(document.getElementById('times_count').value);
+    const container = document.getElementById('times_container');
+    container.innerHTML = '';
+    for(let i=0; i<count; i++) {
+        container.innerHTML += `<input type="time" name="time_${i}" required style="width: auto;">`;
+    }
+}
+</script>
+{% endblock %}

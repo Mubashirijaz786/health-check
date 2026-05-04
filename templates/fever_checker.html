@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card">
+    <h2>Fever Risk Checker</h2>
+    <p style="margin-bottom: 20px;">Enter your body temperature and select your symptoms to check your risk level.</p>
+    
+    <!-- Form submits to the same page -->
+    <form method="POST">
+        <div class="form-group">
+            <label for="temperature">Body Temperature (°C):</label>
+            <input type="number" step="0.1" id="temperature" name="temperature" required placeholder="e.g. 37.5">
+        </div>
+
+        <div class="form-group">
+            <label>Select Symptoms (if any):</label>
+            
+            <div class="checkbox-group">
+                <input type="checkbox" id="headache" name="symptoms" value="headache">
+                <label for="headache" style="font-weight:normal;">Headache</label>
+            </div>
+            
+            <div class="checkbox-group">
+                <input type="checkbox" id="fatigue" name="symptoms" value="fatigue">
+                <label for="fatigue" style="font-weight:normal;">Fatigue</label>
+            </div>
+            
+            <div class="checkbox-group">
+                <input type="checkbox" id="cough" name="symptoms" value="cough">
+                <label for="cough" style="font-weight:normal;">Cough</label>
+            </div>
+            
+            <div class="checkbox-group">
+                <input type="checkbox" id="sore_throat" name="symptoms" value="sore_throat">
+                <label for="sore_throat" style="font-weight:normal;">Sore Throat</label>
+            </div>
+        </div>
+
+        <button type="submit">Check Risk Level</button>
+    </form>
+
+    <!-- If result is set, display the output box -->
+    {% if result %}
+        <div class="result-box {{ risk_level|lower }}">
+            <h3>Risk Level: {{ risk_level }}</h3>
+            <p>{{ result }}</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
