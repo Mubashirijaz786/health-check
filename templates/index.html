@@ -2,253 +2,81 @@
 
 {% block content %}
 <div class="animate-fade-in">
-    <!-- Hero Banner -->
-    <section class="hero-banner">
-        <div class="hero-content">
-            <h1>Expert Care, <br> Simplified.</h1>
-            <p>Welcome to Aura Health. Your personal medical assistant for managing family wellness and medicine reminders.</p>
-            <div style="margin-top: 2rem; display: flex; gap: 1rem;">
-                <a href="{{ url_for('add_person') }}" class="btn btn-primary" style="background: white; color: var(--primary);">
-                    <i data-lucide="plus"></i> Add New Member
-                </a>
-                <a href="{{ url_for('fever_checker') }}" class="btn btn-outline" style="border-color: rgba(255,255,255,0.4); color: white;">
-                    Check Symptoms
-                </a>
-            </div>
+    <!-- Clinical Command Console -->
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 5rem;">
+        <div>
+            <h1 style="font-size: 3rem; letter-spacing: -0.05em; margin-bottom: 0.5rem;">Clinical <span style="color: var(--primary);">Console</span></h1>
+            <p style="color: var(--text-secondary); font-size: 1.1rem; font-weight: 500;">Active care network monitoring and diagnostic summary.</p>
         </div>
-        <!-- Embed the generated illustration -->
-        <img src="/static/medical_dashboard_illustration.png" alt="Health" class="hero-illustration">
-    </section>
+        <a href="{% url 'add_person' %}" class="btn-premium btn-primary" style="height: 60px; padding: 0 2.5rem; border-radius: 16px; font-size: 0.9rem;">
+            + INITIALIZE NEW UNIT
+        </a>
+    </div>
 
-    <!-- Stats Grid -->
-    {% set total_meds = namespace(count=0) %}
-    {% for person in data.persons %}
-        {% set total_meds.count = total_meds.count + person.medicines|length %}
-    {% endfor %}
-
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-icon-box">
-                <i data-lucide="users"></i>
-            </div>
-            <div class="stat-info">
-                <h3>Total Members</h3>
-                <div class="value">{{ data.persons|length }}</div>
+    <!-- System Status Grid -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 2rem; margin-bottom: 5rem;">
+        <div class="glass-card" style="padding: 2rem; border-bottom: 4px solid var(--primary);">
+            <p style="font-size: 0.7rem; font-weight: 800; color: var(--text-dim); text-transform: uppercase; margin-bottom: 1rem;">Network Capacity</p>
+            <div style="display: flex; align-items: baseline; gap: 1rem;">
+                <h2 style="font-size: 2.5rem;">{{ stats.total_patients }}</h2>
+                <span style="color: var(--text-secondary); font-weight: 700;">Units</span>
             </div>
         </div>
-        <div class="stat-card">
-            <div class="stat-icon-box" style="background: #ecfdf5; color: #10b981;">
-                <i data-lucide="pill"></i>
-            </div>
-            <div class="stat-info">
-                <h3>Active Medicines</h3>
-                <div class="value">{{ total_meds.count }}</div>
+        <div class="glass-card" style="padding: 2rem; border-bottom: 4px solid var(--success);">
+            <p style="font-size: 0.7rem; font-weight: 800; color: var(--text-dim); text-transform: uppercase; margin-bottom: 1rem;">Medication Cycles</p>
+            <div style="display: flex; align-items: baseline; gap: 1rem;">
+                <h2 style="font-size: 2.5rem;">{{ stats.total_medicines }}</h2>
+                <span style="color: var(--text-secondary); font-weight: 700;">Active</span>
             </div>
         </div>
-        <div class="stat-card">
-            <div class="stat-icon-box" style="background: #fffbeb; color: #f59e0b;">
-                <i data-lucide="clock"></i>
-            </div>
-            <div class="stat-info" style="flex: 1;">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                    <h3>Next Reminder</h3>
-                    <button onclick="testAlarm()" class="btn btn-outline" style="padding: 2px 6px; font-size: 0.65rem; border-radius: 4px;" title="Test Sound">
-                        <i data-lucide="volume-2" style="width: 12px;"></i>
-                    </button>
-                </div>
-                <div class="value" id="next-reminder">None</div>
+        <div class="glass-card" style="padding: 2rem; border-bottom: 4px solid var(--accent);">
+            <p style="font-size: 0.7rem; font-weight: 800; color: var(--text-dim); text-transform: uppercase; margin-bottom: 1rem;">System Integrity</p>
+            <div style="display: flex; align-items: baseline; gap: 1rem;">
+                <h2 style="font-size: 2.5rem;">100</h2>
+                <span style="color: var(--text-secondary); font-weight: 700;">% Stable</span>
             </div>
         </div>
     </div>
 
-    <!-- Members Section -->
-    <div class="card">
-        <div class="card-header">
-            <h2 class="section-title">
-                <i data-lucide="activity" style="color: var(--primary);"></i>
-                Health Monitor
-            </h2>
-        </div>
-
-        {% if data.persons %}
-            <div class="person-group">
-                {% for person in data.persons %}
-                    <div class="person-card">
-                        <div class="person-card-header">
-                            <div class="person-info">
-                                <div class="person-avatar">{{ person.name[0]|upper }}</div>
-                                <div>
-                                    <h4 style="font-weight: 700;">{{ person.name }}</h4>
-                                    <span style="font-size: 0.8rem; color: var(--text-muted);">{{ person.medicines|length }} Medications</span>
-                                </div>
-                            </div>
-                            <div class="btn-group" style="display: flex; gap: 0.5rem;">
-                                <a href="{{ url_for('add_medicine_to_person', person_id=person.id) }}" class="btn btn-outline" style="padding: 0.5rem;" title="Add Medicine">
-                                    <i data-lucide="plus-circle" style="width: 18px;"></i>
-                                </a>
-                                <form action="{{ url_for('delete_person', person_id=person.id) }}" method="POST" onsubmit="return confirm('Remove member?');">
-                                    <button type="submit" class="btn btn-danger" style="padding: 0.5rem;">
-                                        <i data-lucide="trash-2" style="width: 18px;"></i>
-                                    </button>
-                                </form>
-                            </div>
+    <!-- Active Care Units -->
+    <div style="margin-bottom: 3rem;">
+        <h3 style="font-size: 1.4rem; margin-bottom: 2.5rem; display: flex; align-items: center; gap: 1rem;">
+            <div style="width: 10px; height: 10px; background: var(--primary); border-radius: 50%;"></div>
+            Active Care Units
+        </h3>
+        
+        <div class="dashboard-grid">
+            {% for person in persons %}
+                <div class="glass-card" style="padding: 2.5rem; transition: 0.4s; overflow: hidden;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem;">
+                        <div style="width: 56px; height: 56px; border-radius: 16px; background: rgba(99, 102, 241, 0.1); color: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.5rem;">
+                            {{ person.name.0|upper }}
                         </div>
-                        
-                        <div class="med-list">
-                            {% if person.medicines %}
-                                {% for med in person.medicines %}
-                                    <div class="med-item animate-fade-in" style="animation-delay: {{ loop.index0 * 0.1 }}s">
-                                        <div style="display: flex; gap: 1rem; align-items: center;">
-                                            <div style="background: var(--bg-secondary); padding: 0.5rem; border-radius: 8px;">
-                                                <i data-lucide="pill" style="width: 20px; color: var(--primary);"></i>
-                                            </div>
-                                            <div>
-                                                <h5 style="font-weight: 700;">{{ med.name }}</h5>
-                                                <small style="color: var(--text-muted);">{{ med.dosage }} • {{ med.total_days }} days left</small>
-                                            </div>
-                                        </div>
-                                        <div style="text-align: right;">
-                                            <div style="display: flex; gap: 4px; margin-bottom: 4px;">
-                                                {% for t in med.times %}
-                                                    <span class="time-badge" style="background: var(--primary-soft); color: var(--primary); padding: 2px 8px; border-radius: 99px; font-size: 0.7rem; font-weight: 600;">{{ t }}</span>
-                                                {% endfor %}
-                                            </div>
-                                            <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
-                                                <a href="{{ url_for('edit_medicine', person_id=person.id, medicine_id=med.id) }}" style="color: var(--text-muted);"><i data-lucide="edit-3" style="width: 14px;"></i></a>
-                                                <form action="{{ url_for('delete_medicine', person_id=person.id, medicine_id=med.id) }}" method="POST">
-                                                    <button type="submit" style="background: none; border: none; color: #f87171; cursor: pointer;"><i data-lucide="x-circle" style="width: 14px;"></i></button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                {% endfor %}
-                            {% else %}
-                                <div style="text-align: center; padding: 1rem; color: var(--text-muted);">
-                                    <p style="font-size: 0.9rem;">No medicines assigned.</p>
-                                </div>
-                            {% endif %}
+                        <div style="display: flex; gap: 0.5rem;">
+                            <a href="{% url 'delete_person' person.id %}" style="color: var(--text-dim); opacity: 0.5; transition: 0.3s;" onmouseover="this.style.opacity='1'; this.style.color='var(--danger)'">
+                                <i data-lucide="trash-2" style="width: 18px;"></i>
+                            </a>
                         </div>
                     </div>
-                {% endfor %}
-            </div>
-        {% else %}
-            <div class="empty-state" style="text-align: center; padding: 4rem;">
-                <i data-lucide="user-plus" style="width: 64px; height: 64px; color: var(--border); margin-bottom: 1rem;"></i>
-                <h3 style="color: var(--text-muted);">No members added yet</h3>
-                <p style="color: var(--text-muted); margin-bottom: 2rem;">Start by adding a family member to track their health.</p>
-                <a href="{{ url_for('add_person') }}" class="btn btn-primary">Add Member</a>
-            </div>
-        {% endif %}
-    </div>
-</div>
-
-<!-- Alarm Modal (Minimal & Clean) -->
-<div id="alarmModal" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.8); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
-    <div class="card" style="max-width: 400px; width: 90%; text-align: center; border: none; box-shadow: var(--shadow-lg);">
-        <div style="background: var(--primary-soft); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: var(--primary);">
-            <i data-lucide="bell-ring" style="width: 40px; height: 40px;"></i>
-        </div>
-        <h2 style="margin-bottom: 0.5rem;">Medication Time!</h2>
-        <div id="alarmMessage" style="color: var(--text-muted); margin-bottom: 2rem;"></div>
-        <button class="btn btn-primary" style="width: 100%;" onclick="dismissAlarm()">I've taken it</button>
-    </div>
-</div>
-
-<!-- Audio for Alarm (Local beep.mp3) -->
-<audio id="alarmAudio" preload="auto">
-    <source src="{{ url_for('static', filename='beep.mp3') }}" type="audio/mpeg">
-</audio>
-
-<script>
-    const reminders = [
-        {% for person in data.persons %}
-            {% for med in person.medicines %}
-                {% for t in med.times %}
-                    { time: "{{ t }}", msg: "{{ person.name }}: {{ med.name }} ({{ med.dosage }})" },
-                {% endfor %}
+                    
+                    <h4 style="font-size: 1.4rem; color: white; margin-bottom: 0.5rem;">{{ person.name }}</h4>
+                    <p style="color: var(--text-dim); font-size: 0.85rem; margin-bottom: 2rem;">Clinical ID: {{ person.id|stringformat:".8s" }}</p>
+                    
+                    <div style="border-top: 1px solid var(--border-glass); padding-top: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="display: flex; gap: 0.4rem;">
+                            {% for med in person.medicines.all|slice:":3" %}
+                                <div style="width: 8px; height: 8px; border-radius: 50%; background: var(--success);"></div>
+                            {% endfor %}
+                        </div>
+                        <span style="font-size: 0.75rem; color: var(--primary); font-weight: 800;">{{ person.medicines.count }} ACTIVE MEDS</span>
+                    </div>
+                </div>
+            {% empty %}
+                <div style="grid-column: 1/-1; text-align: center; padding: 10rem 0; opacity: 0.3;">
+                    <h3 style="font-size: 1.5rem;">No Clinical Records Detected</h3>
+                </div>
             {% endfor %}
-        {% endfor %}
-    ];
-
-    let triggered = new Set();
-    let beepInterval = null;
-    const alarmAudio = document.getElementById('alarmAudio');
-
-    function playBeepLoop() {
-        // Clear any existing loop
-        if (beepInterval) clearInterval(beepInterval);
-        
-        // Play beep 10 times or until dismissed
-        let count = 0;
-        beepInterval = setInterval(() => {
-            alarmAudio.currentTime = 0;
-            alarmAudio.play().catch(e => console.log("Audio play blocked. Click anywhere to enable."));
-            count++;
-            if (count >= 10) {
-                clearInterval(beepInterval);
-                beepInterval = null;
-            }
-        }, 1000);
-    }
-
-    function testAlarm() {
-        playBeepLoop();
-        alert("Sound started! Click 'I've taken it' or refresh to stop.");
-    }
-
-    function checkReminders() {
-        const now = new Date();
-        const curTime = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
-        
-        const due = reminders.filter(r => r.time === curTime && !triggered.has(r.time + r.msg));
-        
-        if (due.length > 0) {
-            const msg = due.map(d => d.msg).join('<br>');
-            document.getElementById('alarmMessage').innerHTML = msg;
-            document.getElementById('alarmModal').style.display = 'flex';
-            
-            playBeepLoop();
-            
-            due.forEach(d => triggered.add(d.time + d.msg));
-        }
-
-        // Reset triggered at midnight
-        if (curTime === "00:00") triggered.clear();
-
-        // Update Next Reminder Stat
-        updateNextReminder(curTime);
-    }
-
-    function updateNextReminder(curTime) {
-        let upcoming = reminders.filter(r => r.time > curTime).sort((a,b) => a.time.localeCompare(b.time));
-        if (upcoming.length === 0 && reminders.length > 0) {
-            upcoming = reminders.sort((a,b) => a.time.localeCompare(b.time));
-        }
-        
-        const nextEl = document.getElementById('next-reminder');
-        if (nextEl) {
-            nextEl.textContent = upcoming.length > 0 ? formatTime12(upcoming[0].time) : "None";
-        }
-    }
-
-    // Format all existing time badges on load
-    window.addEventListener('DOMContentLoaded', () => {
-        document.querySelectorAll('.time-badge').forEach(el => {
-            el.textContent = formatTime12(el.textContent.trim());
-        });
-    });
-
-    function dismissAlarm() {
-        document.getElementById('alarmModal').style.display = 'none';
-        if (beepInterval) {
-            clearInterval(beepInterval);
-            beepInterval = null;
-        }
-        alarmAudio.pause();
-        alarmAudio.currentTime = 0;
-    }
-
-    setInterval(checkReminders, 1000);
-    checkReminders();
-</script>
+        </div>
+    </div>
+</div>
 {% endblock %}

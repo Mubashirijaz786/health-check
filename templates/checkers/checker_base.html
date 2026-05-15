@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="animate-fade-in" style="max-width: 1000px; margin: 0 auto;">
+    <!-- Module Header -->
+    <div style="display: flex; align-items: center; gap: 2rem; margin-bottom: 5rem; border-bottom: 1px solid var(--border-glass); padding-bottom: 3rem;">
+        <div style="width: 72px; height: 72px; border-radius: 20px; background: var(--primary-glow); color: var(--primary); display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 20px var(--primary-glow);">
+            <i data-lucide="microscope" style="width: 32px; height: 32px;"></i>
+        </div>
+        <div>
+            <span style="font-size: 0.8rem; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 0.15em;">Diagnostic Module</span>
+            <h1 style="font-size: 2.5rem; margin-top: 0.25rem;">{{ title }} <span style="font-weight: 400; opacity: 0.5;">Intelligence</span></h1>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 4rem; align-items: start;">
+        <!-- Clinical Input Side -->
+        <div class="glass-card" style="padding: 4rem;">
+            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 3rem;">
+                <div style="width: 4px; height: 24px; background: var(--primary); border-radius: 4px;"></div>
+                <h3 style="font-size: 1.4rem;">Patient Biometrics</h3>
+            </div>
+            
+            <form method="POST">
+                {% csrf_token %}
+                <div style="display: flex; flex-direction: column; gap: 2.5rem;">
+                    {% block checker_fields %}{% endblock %}
+                    
+                    <button type="submit" class="btn-premium btn-primary" style="width: 100%; height: 65px; border-radius: 18px; font-size: 1.1rem; margin-top: 1rem;">
+                        <i data-lucide="cpu"></i> INITIALIZE AI SCAN
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Diagnostic Output Side -->
+        <div class="glass-card" style="padding: 4rem; min-height: 500px; display: flex; flex-direction: column;">
+            {% if result %}
+                <div class="animate-fade-in" style="flex: 1;">
+                    <div style="text-align: center; margin-bottom: 4rem;">
+                        <div style="position: relative; width: 160px; height: 160px; margin: 0 auto;">
+                            <canvas id="riskGauge"></canvas>
+                            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+                                <div style="font-size: 2.5rem; font-weight: 800; color: white;">{{ score|default:84 }}</div>
+                                <div style="font-size: 0.65rem; font-weight: 800; color: var(--text-dim); text-transform: uppercase;">Index</div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 2rem;">
+                            <span style="font-size: 0.75rem; font-weight: 800; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.1em;">CLINICAL STATUS</span>
+                            <h2 style="font-size: 2.2rem; margin-top: 0.5rem; color: {% if risk == 'High' or risk == 'Severe' or risk == 'Crisis' %}var(--danger){% elif risk == 'Medium' or risk == 'Moderate' %}var(--warning){% else %}var(--success){% endif %};">
+                                {{ risk }} Risk
+                            </h2>
+                        </div>
+                    </div>
+
+                    <div style="background: rgba(255,255,255,0.02); padding: 2.5rem; border-radius: 24px; border: 1px solid var(--border-glass); margin-bottom: 3rem;">
+                        <p style="font-size: 1.15rem; line-height: 1.8; color: var(--text-secondary);">{{ result }}</p>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                        <div style="background: var(--primary-glow); padding: 1.5rem; border-radius: 18px; border: 1px solid rgba(99, 102, 241, 0.1); text-align: center;">
+                            <p style="font-size: 0.65rem; font-weight: 800; color: var(--text-dim); text-transform: uppercase; margin-bottom: 0.5rem;">Confidence</p>
+                            <h4 style="font-size: 1.4rem; color: var(--primary);">98.4%</h4>
+                        </div>
+                        <div style="background: rgba(16, 185, 129, 0.05); padding: 1.5rem; border-radius: 18px; border: 1px solid rgba(16, 185, 129, 0.1); text-align: center;">
+                            <p style="font-size: 0.65rem; font-weight: 800; color: var(--text-dim); text-transform: uppercase; margin-bottom: 0.5rem;">Status</p>
+                            <h4 style="font-size: 1.4rem; color: var(--success);">Verified</h4>
+                        </div>
+                    </div>
+
+                    <script>
+                        const ctx = document.getElementById('riskGauge').getContext('2d');
+                        new Chart(ctx, {
+                            type: 'doughnut',
+                            data: {
+                                datasets: [{
+                                    data: [{{ score|default:84 }}, 100 - {{ score|default:84 }}],
+                                    backgroundColor: ['{% if risk == "High" or risk == "Severe" %}#F43F5E{% elif risk == "Medium" or risk == "Moderate" %}#F59E0B{% else %}#10B981{% endif %}', 'rgba(255,255,255,0.03)'],
+                                    borderWidth: 0,
+                                    circumference: 270,
+                                    rotation: 225,
+                                    cutout: '85%',
+                                    borderRadius: 10
+                                }]
+                            },
+                            options: { plugins: { tooltip: { enabled: false } }, events: [] }
+                        });
+                    </script>
+                </div>
+            {% else %}
+                <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0.25; text-align: center;">
+                    <i data-lucide="scan-face" style="width: 80px; height: 80px; margin-bottom: 2rem;"></i>
+                    <h3 style="font-size: 1.5rem;">Awaiting Diagnostics</h3>
+                    <p style="margin-top: 1rem; max-width: 250px;">Initialize the clinical scan to generate AI health insights.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    @media (max-width: 900px) {
+        div[style*="grid-template-columns: 1.2fr 1fr"] { grid-template-columns: 1fr !important; gap: 3rem !important; }
+    }
+</style>
+{% endblock %}

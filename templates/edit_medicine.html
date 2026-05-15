@@ -1,14 +1,15 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="animate-fade-in" style="max-width: 600px; margin: 0 auto;">
-    <div class="top-info" style="margin-bottom: 2.5rem;">
-        <h1 style="font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem;">Edit Medication</h1>
-        <p style="color: var(--text-muted);">Modify the schedule for <strong>{{ medicine.name }}</strong>.</p>
+<div class="animate-in" style="max-width: 600px; margin: 0 auto;">
+    <div style="margin-bottom: 3rem;">
+        <h1 style="font-size: 2.25rem; font-weight: 800; margin-bottom: 0.5rem;">Edit Medication</h1>
+        <p style="color: var(--text-muted); font-size: 1.1rem; font-weight: 500;">Modifying schedule for <strong>{{ person.name }}</strong></p>
     </div>
 
-    <div class="card">
-        <form action="{{ url_for('edit_medicine', person_id=person.id, medicine_id=medicine.id) }}" method="POST">
+    <div class="card" style="padding: 2.5rem;">
+        <form method="POST">
+            {% csrf_token %}
             <div class="form-group">
                 <label>Medicine Name</label>
                 <input type="text" name="name" value="{{ medicine.name }}" required>
@@ -21,52 +22,43 @@
 
             <div class="form-group">
                 <label>Duration (Days)</label>
-                <input type="number" name="total_days" value="{{ medicine.total_days }}" required min="1">
+                <input type="number" name="total_days" value="{{ medicine.total_days }}" required>
             </div>
 
             <div class="form-group">
                 <label>Reminder Times</label>
-                <div id="times_container" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;">
+                <div id="tCont" style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.5rem;">
                     {% for t in medicine.times %}
-                        <div class="time-item" style="display: flex; align-items: center; gap: 0.5rem; background: var(--bg-secondary); padding: 0.25rem 0.5rem; border-radius: 8px;">
-                            <input type="time" name="time_{{ loop.index0 }}" value="{{ t }}" required style="width: auto; border: none; background: transparent;">
-                            <button type="button" onclick="this.parentElement.remove()" style="background: none; border: none; color: var(--danger); cursor: pointer;">
-                                <i data-lucide="minus-circle" style="width: 16px;"></i>
-                            </button>
+                        <div style="display: flex; align-items: center; gap: 0.25rem; background: var(--bg-body); padding: 0.5rem; border-radius: 10px; border: 1px solid var(--border);">
+                            <input type="time" name="time_{{ forloop.index0 }}" value="{{ t }}" required style="border: none; background: none; width: auto; font-weight: 700;">
+                            <button type="button" onclick="this.parentElement.remove()" style="background: none; border: none; color: var(--danger); cursor: pointer;"><i data-lucide="minus-circle" style="width: 16px;"></i></button>
                         </div>
                     {% endfor %}
                 </div>
-                <button type="button" onclick="addTime()" class="btn btn-outline" style="padding: 0.5rem; font-size: 0.8rem;">
-                    <i data-lucide="clock"></i> Add Time
+                <button type="button" onclick="addT()" class="btn btn-outline" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">
+                    <i data-lucide="plus"></i> Add Another Time
                 </button>
             </div>
 
-            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
-                <button type="submit" class="btn btn-primary" style="flex: 2;">
-                    <i data-lucide="check"></i> Update Medication
-                </button>
-                <a href="{{ url_for('index') }}" class="btn btn-outline" style="flex: 1;">Cancel</a>
+            <div style="display: flex; gap: 1rem; margin-top: 3rem;">
+                <button type="submit" class="btn btn-primary" style="flex: 2; justify-content: center; height: 56px;">Save Changes</button>
+                <a href="{% url 'index' %}" class="btn btn-outline" style="flex: 1; justify-content: center; height: 56px;">Cancel</a>
             </div>
         </form>
     </div>
 </div>
 
 <script>
-    let timeCount = {{ medicine.times|length }};
-    function addTime() {
-        const container = document.getElementById('times_container');
+    let tIdx = {{ medicine.times|length }};
+    function addT() {
         const div = document.createElement('div');
-        div.className = 'time-item';
-        div.style = "display: flex; align-items: center; gap: 0.5rem; background: var(--bg-secondary); padding: 0.25rem 0.5rem; border-radius: 8px;";
+        div.style = "display: flex; align-items: center; gap: 0.25rem; background: var(--bg-body); padding: 0.5rem; border-radius: 10px; border: 1px solid var(--border);";
         div.innerHTML = `
-            <input type="time" name="time_${timeCount}" required style="width: auto; border: none; background: transparent;">
-            <button type="button" onclick="this.parentElement.remove()" style="background: none; border: none; color: var(--danger); cursor: pointer;">
-                <i data-lucide="minus-circle" style="width: 16px;"></i>
-            </button>
+            <input type="time" name="time_${tIdx++}" required style="border: none; background: none; width: auto; font-weight: 700;">
+            <button type="button" onclick="this.parentElement.remove()" style="background: none; border: none; color: var(--danger); cursor: pointer;"><i data-lucide="minus-circle" style="width: 16px;"></i></button>
         `;
-        container.appendChild(div);
+        document.getElementById('tCont').appendChild(div);
         lucide.createIcons();
-        timeCount++;
     }
 </script>
 {% endblock %}

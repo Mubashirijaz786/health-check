@@ -1,0 +1,30 @@
+{% extends 'checkers/checker_base.html' %}
+
+{% block checker_fields %}
+{% with title="Weight Check (BMI)" description="Check if your weight is healthy for your height." %}
+
+<div class="form-group">
+    <label class="form-label">Your Weight (kg)</label>
+    <input type="number" step="0.1" name="weight" required class="input-premium" placeholder="e.g. 70">
+</div>
+
+<div class="form-group">
+    <label class="form-label">Your Height</label>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+        <div style="position: relative;">
+            <input type="number" name="feet" required class="input-premium" placeholder="Feet">
+            <span style="position: absolute; right: 1.5rem; top: 50%; transform: translateY(-50%); color: var(--text-dim); font-weight: 800; font-size: 0.8rem;">FT</span>
+        </div>
+        <div style="position: relative;">
+            <input type="number" name="inches" required class="input-premium" placeholder="Inches">
+            <span style="position: absolute; right: 1.5rem; top: 50%; transform: translateY(-50%); color: var(--text-dim); font-weight: 800; font-size: 0.8rem;">IN</span>
+        </div>
+    </div>
+</div>
+
+<div class="glass-card" style="padding: 1.5rem;">
+    <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">This tool uses your height and weight to calculate if you are in a healthy range.</p>
+</div>
+
+{% endwith %}
+{% endblock %}

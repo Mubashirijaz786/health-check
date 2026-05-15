@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="animate-fade-in">
+    <div style="margin-bottom: 5rem; text-align: center;">
+        <h1 style="font-size: 3rem; margin-bottom: 1rem; letter-spacing: -0.05em;">AI Health <span style="color: var(--primary);">Checkers</span></h1>
+        <p style="color: var(--text-secondary); font-size: 1.1rem; max-width: 600px; margin: 0 auto;">Select a tool below to check your health status using AI.</p>
+    </div>
+
+    <div class="dashboard-grid">
+        <!-- Fever -->
+        <div class="glass-card" style="padding: 2.5rem;">
+            <div style="width: 50px; height: 50px; border-radius: 12px; background: rgba(244, 63, 94, 0.1); color: var(--danger); display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem;">
+                <i data-lucide="thermometer"></i>
+            </div>
+            <h3 style="font-size: 1.3rem; margin-bottom: 0.5rem;">Fever Check</h3>
+            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 2rem;">Check if you have a fever or infection.</p>
+            <a href="{% url 'fever_checker' %}" class="btn-premium btn-primary" style="width: 100%; border-radius: 10px; text-align: center;">Check Now</a>
+        </div>
+
+        <!-- Heart -->
+        <div class="glass-card" style="padding: 2.5rem;">
+            <div style="width: 50px; height: 50px; border-radius: 12px; background: rgba(244, 63, 94, 0.1); color: var(--danger); display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem;">
+                <i data-lucide="heart"></i>
+            </div>
+            <h3 style="font-size: 1.3rem; margin-bottom: 0.5rem;">Heart Risk</h3>
+            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 2rem;">Check your heart health and risk levels.</p>
+            <a href="{% url 'heart_checker' %}" class="btn-premium btn-primary" style="width: 100%; border-radius: 10px; text-align: center;">Check Now</a>
+        </div>
+
+        <!-- Diabetes -->
+        <div class="glass-card" style="padding: 2.5rem;">
+            <div style="width: 50px; height: 50px; border-radius: 12px; background: rgba(16, 185, 129, 0.1); color: var(--success); display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem;">
+                <i data-lucide="droplet"></i>
+            </div>
+            <h3 style="font-size: 1.3rem; margin-bottom: 0.5rem;">Diabetes Check</h3>
+            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 2rem;">Check your sugar levels and diabetes risk.</p>
+            <a href="{% url 'diabetes_checker' %}" class="btn-premium btn-primary" style="width: 100%; border-radius: 10px; text-align: center;">Check Now</a>
+        </div>
+
+        <!-- Dengue -->
+        <div class="glass-card" style="padding: 2.5rem;">
+            <div style="width: 50px; height: 50px; border-radius: 12px; background: rgba(245, 158, 11, 0.1); color: var(--warning); display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem;">
+                <i data-lucide="bug"></i>
+            </div>
+            <h3 style="font-size: 1.3rem; margin-bottom: 0.5rem;">Dengue Fever</h3>
+            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 2rem;">Check for dengue symptoms and platelet count.</p>
+            <a href="{% url 'dengue_checker' %}" class="btn-premium btn-primary" style="width: 100%; border-radius: 10px; text-align: center;">Check Now</a>
+        </div>
+
+        <!-- BMI -->
+        <div class="glass-card" style="padding: 2.5rem;">
+            <div style="width: 50px; height: 50px; border-radius: 12px; background: rgba(99, 102, 241, 0.1); color: var(--primary); display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem;">
+                <i data-lucide="scale"></i>
+            </div>
+            <h3 style="font-size: 1.3rem; margin-bottom: 0.5rem;">Weight & BMI</h3>
+            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 2rem;">Check if your weight is healthy for your height.</p>
+            <a href="{% url 'bmi_checker' %}" class="btn-premium btn-primary" style="width: 100%; border-radius: 10px; text-align: center;">Check Now</a>
+        </div>
+
+        <!-- BP -->
+        <div class="glass-card" style="padding: 2.5rem;">
+            <div style="width: 50px; height: 50px; border-radius: 12px; background: rgba(14, 165, 233, 0.1); color: #0EA5E9; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem;">
+                <i data-lucide="activity"></i>
+            </div>
+            <h3 style="font-size: 1.3rem; margin-bottom: 0.5rem;">Blood Pressure</h3>
+            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 2rem;">Check your blood pressure levels.</p>
+            <a href="{% url 'bp_checker' %}" class="btn-premium btn-primary" style="width: 100%; border-radius: 10px; text-align: center;">Check Now</a>
+        </div>
+
+        <!-- Diet -->
+        <div class="glass-card" style="padding: 2.5rem;">
+            <div style="width: 50px; height: 50px; border-radius: 12px; background: rgba(16, 185, 129, 0.1); color: var(--success); display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem;">
+                <i data-lucide="utensils"></i>
+            </div>
+            <h3 style="font-size: 1.3rem; margin-bottom: 0.5rem;">Diet Plan</h3>
+            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 2rem;">Get a simple diet plan based on your weight.</p>
+            <a href="{% url 'diet_planner' %}" class="btn-premium btn-primary" style="width: 100%; border-radius: 10px; text-align: center;">Check Now</a>
+        </div>
+
+        <!-- Covid -->
+        <div class="glass-card" style="padding: 2.5rem;">
+            <div style="width: 50px; height: 50px; border-radius: 12px; background: rgba(6, 182, 212, 0.1); color: var(--accent); display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem;">
+                <i data-lucide="wind"></i>
+            </div>
+            <h3 style="font-size: 1.3rem; margin-bottom: 0.5rem;">Lung Check</h3>
+            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 2rem;">Check for Covid or lung infection risk.</p>
+            <a href="{% url 'covid_checker' %}" class="btn-premium btn-primary" style="width: 100%; border-radius: 10px; text-align: center;">Check Now</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

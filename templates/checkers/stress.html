@@ -1,0 +1,33 @@
+{% extends 'checkers/checker_base.html' %}
+
+{% block checker_fields %}
+{% with title="Neuro-Wellness" description="Stress index mapping and psychological equilibrium assessment." %}
+
+<div class="form-group">
+    <label class="form-label">Average Sleep (Hours)</label>
+    <input type="number" name="sleep" required class="input-premium" value="8">
+</div>
+
+<div class="form-group">
+    <label class="form-label">Self-Assessment (1-10)</label>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+        <div>
+            <label class="form-label" style="font-size: 0.7rem;">Anxiety Level</label>
+            <input type="number" name="anxiety" min="1" max="10" required class="input-premium" value="1">
+        </div>
+        <div>
+            <label class="form-label" style="font-size: 0.7rem;">Workload Stress</label>
+            <input type="number" name="workload" min="1" max="10" required class="input-premium" value="1">
+        </div>
+    </div>
+</div>
+
+<div class="glass-card" style="padding: 2.5rem; background: rgba(99, 102, 241, 0.03); border-color: rgba(99, 102, 241, 0.1);">
+    <div style="display: flex; align-items: flex-start; gap: 1.5rem;">
+        <i data-lucide="brain" style="color: var(--primary); width: 24px;"></i>
+        <p style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6;">Our AI quantifies your stress index based on neural performance indicators and physiological rest patterns.</p>
+    </div>
+</div>
+
+{% endwith %}
+{% endblock %}

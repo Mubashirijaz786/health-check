@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="animate-fade-in" style="max-width: 1200px; margin: 0 auto;">
+    <div style="margin-bottom: 5rem; text-align: center;">
+        <h1 style="font-size: 3.5rem; margin-bottom: 1rem; letter-spacing: -0.05em;">Clinical <span style="color: var(--primary);">Finder</span></h1>
+        <p style="color: var(--text-secondary); font-size: 1.25rem; max-width: 700px; margin: 0 auto; line-height: 1.6;">Locate the nearest specialized medical facilities and emergency trauma centers within your vicinity.</p>
+    </div>
+
+    <!-- Search Station -->
+    <div class="glass-card" style="padding: 4rem; margin-bottom: 4rem;">
+        <div style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 300px; position: relative;">
+                <i data-lucide="map-pin" style="position: absolute; left: 1.5rem; top: 50%; transform: translateY(-50%); color: var(--primary); width: 22px;"></i>
+                <input type="text" id="locationInput" class="input-premium" placeholder="Enter City or Area (e.g. London)" style="padding-left: 4.5rem; height: 65px; border-radius: 18px;">
+            </div>
+            <button onclick="findHospitals()" id="searchBtn" class="btn-premium btn-primary" style="padding: 0 3rem; height: 65px; border-radius: 18px; font-size: 1rem;">
+                INITIALIZE SEARCH
+            </button>
+        </div>
+    </div>
+
+    <!-- Results Grid -->
+    <div id="hospitalContainer" class="hospital-grid">
+        <!-- Dynamically populated cards -->
+        <div style="grid-column: 1/-1; text-align: center; padding: 10rem 0; opacity: 0.3;">
+            <i data-lucide="search" style="width: 64px; height: 64px; margin-bottom: 2rem;"></i>
+            <h3 style="font-size: 1.5rem;">Awaiting Location Data</h3>
+        </div>
+    </div>
+</div>
+
+<script>
+    async function findHospitals() {
+        const loc = document.getElementById('locationInput').value;
+        const btn = document.getElementById('searchBtn');
+        const container = document.getElementById('hospitalContainer');
+        
+        if (!loc) return;
+        
+        btn.disabled = true;
+        btn.innerHTML = '<span class="animate-pulse">SCANNING SATELLITES...</span>';
+        
+        try {
+            const res = await fetch(`/api/hospitals/?location=${encodeURIComponent(loc)}`);
+            const data = await res.json();
+            
+            container.innerHTML = '';
+            if (data.hospitals && data.hospitals.length > 0) {
+                data.hospitals.forEach(h => {
+                    const card = document.createElement('div');
+                    card.className = 'hospital-card animate-fade-in';
+                    card.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
+                            <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(99, 102, 241, 0.1); color: var(--primary); display: flex; align-items: center; justify-content: center;">
+                                <i data-lucide="hospital"></i>
+                            </div>
+                            <span class="stat-pill" style="background: rgba(16, 185, 129, 0.1); color: var(--success); font-size: 0.65rem;">VERIFIED</span>
+                        </div>
+                        <h4 style="font-size: 1.2rem; color: white; margin-bottom: 0.75rem;">${h.name}</h4>
+                        <p style="color: var(--text-dim); font-size: 0.85rem; line-height: 1.5; margin-bottom: 2rem;">${h.address.join(', ')}</p>
+                        <a href="https://www.google.com/maps/search/${encodeURIComponent(h.name + ' ' + h.address.join(' '))}" target="_blank" class="btn-premium btn-primary" style="width: 100%; font-size: 0.75rem; padding: 0.75rem; border-radius: 10px; display: block; text-align: center; text-decoration: none;">
+                            VIEW ON MAP
+                        </a>
+                    `;
+                    container.appendChild(card);
+                });
+                lucide.createIcons();
+            } else {
+                container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 5rem; color: var(--text-dim);">No verified clinical facilities found in this sector.</div>';
+            }
+        } catch (e) {
+            container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 5rem; color: var(--danger);">Satellite connection lost. Please retry.</div>';
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = 'INITIALIZE SEARCH';
+        }
+    }
+</script>
+{% endblock %}

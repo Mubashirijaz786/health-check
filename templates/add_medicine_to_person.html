@@ -2,64 +2,52 @@
 
 {% block content %}
 <div class="animate-fade-in" style="max-width: 600px; margin: 0 auto;">
-    <div class="top-info" style="margin-bottom: 2.5rem;">
-        <h1 style="font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem;">New Medication</h1>
-        <p style="color: var(--text-muted);">Assign a new medicine schedule for <strong>{{ person.name }}</strong>.</p>
+    <div style="margin-bottom: 4rem; text-align: center;">
+        <h1 style="font-size: 2.5rem; margin-bottom: 1rem;">Add <span style="color: var(--primary);">Medicine</span></h1>
+        <p style="color: var(--text-secondary);">Add a new medicine for <b>{{ person.name }}</b>.</p>
     </div>
 
-    <div class="card">
-        <form action="{{ url_for('add_medicine_to_person', person_id=person.id) }}" method="POST">
-            <div class="form-group">
-                <label>Medicine Name</label>
-                <input type="text" name="name" required placeholder="e.g. Ibuprofen">
-            </div>
-            
-            <div class="form-group">
-                <label>Dosage</label>
-                <input type="text" name="dosage" required placeholder="e.g. 200mg tab">
-            </div>
+    <form method="POST" class="glass-card" style="padding: 3rem;">
+        {% csrf_token %}
+        <div class="form-group">
+            <label class="form-label">Medicine Name</label>
+            <input type="text" name="name" required placeholder="e.g. Panadol" class="input-premium">
+        </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                <div class="form-group">
-                    <label>Duration (Days)</label>
-                    <input type="number" name="total_days" required value="7" min="1">
-                </div>
-                <div class="form-group">
-                    <label>Frequency</label>
-                    <select id="times_count" onchange="updateTimes()">
-                        <option value="1">1x Daily</option>
-                        <option value="2">2x Daily</option>
-                        <option value="3">3x Daily</option>
-                        <option value="4">4x Daily</option>
-                    </select>
-                </div>
-            </div>
-
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 2rem;">
             <div class="form-group">
-                <label>Reminder Times</label>
-                <div id="times_container" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                    <input type="time" name="time_0" required style="width: auto;">
-                </div>
+                <label class="form-label">Dose (e.g. 500mg)</label>
+                <input type="text" name="dosage" required placeholder="500mg" class="input-premium">
             </div>
+            <div class="form-group">
+                <label class="form-label">Days (Total)</label>
+                <input type="number" name="total_days" required value="7" class="input-premium">
+            </div>
+        </div>
 
-            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
-                <button type="submit" class="btn btn-primary" style="flex: 2;">
-                    <i data-lucide="plus"></i> Add to Schedule
-                </button>
-                <a href="{{ url_for('index') }}" class="btn btn-outline" style="flex: 1;">Cancel</a>
+        <div class="form-group" style="margin-top: 2.5rem;">
+            <label class="form-label">Reminder Times</label>
+            <div id="timeStream" style="display: flex; flex-direction: column; gap: 1rem;">
+                <input type="time" name="time_1" required class="input-premium" style="width: auto;">
             </div>
-        </form>
-    </div>
+            <button type="button" onclick="addTime()" style="background:none; border:none; color:var(--primary); font-weight:800; margin-top:1.5rem; cursor:pointer; font-size:0.8rem;">+ ADD ANOTHER TIME</button>
+        </div>
+
+        <button type="submit" class="btn-premium btn-primary" style="width: 100%; height: 55px; border-radius: 12px; margin-top: 3rem;">
+            SAVE MEDICINE
+        </button>
+        <a href="{% url 'index' %}" style="display: block; text-align: center; margin-top: 1.5rem; color: var(--text-dim); text-decoration: none; font-weight: 700;">CANCEL</a>
+    </form>
 </div>
 
 <script>
-    function updateTimes() {
-        const count = parseInt(document.getElementById('times_count').value);
-        const container = document.getElementById('times_container');
-        container.innerHTML = '';
-        for(let i=0; i<count; i++) {
-            container.innerHTML += `<input type="time" name="time_${i}" required style="width: auto;">`;
-        }
+    let tCount = 1;
+    function addTime() {
+        tCount++;
+        const i = document.createElement('input');
+        i.type = 'time'; i.name = 'time_' + tCount; i.className = 'input-premium';
+        i.style = "width: auto; margin-top: 0.5rem;";
+        document.getElementById('timeStream').appendChild(i);
     }
 </script>
 {% endblock %}
