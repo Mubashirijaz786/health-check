@@ -1,27 +1,13 @@
 import os
 import sys
+from django.core.wsgi import get_wsgi_application
 
-# Add the 'api' directory to the Python path so Vercel can find our local modules
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+# Add the project root to the Python path
+path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if path not in sys.path:
+    sys.path.append(path)
 
-from flask import Flask
-from routes import register_routes
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 
-# Vercel runs app.py from inside the "api" folder.
-# We need to explicitly tell Flask where our "templates" and "static" folders are.
-base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-app = Flask(__name__, 
-            template_folder=os.path.join(base_dir, 'templates'),
-            static_folder=os.path.join(base_dir, 'static'))
-
-# Secret key is needed to use flash messages securely
-app.secret_key = 'super_secret_beginner_key'
-
-# Register our routes safely
-register_routes(app)
-
-# Vercel imports 'app' directly. It doesn't use the block below.
-if __name__ == '__main__':
-    # Start the application in debug mode for easier development locally
-    app.run(debug=True, port=5000)
+# This is the WSGI application that Vercel will use
+app = get_wsgi_application()
