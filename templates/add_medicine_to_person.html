@@ -1,57 +1,65 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="card">
-    <h2>Add Medicine for {{ person.name }}</h2>
-    
-    <form action="{{ url_for('add_medicine_to_person', person_id=person.id) }}" method="POST">
-        <div class="form-group">
-            <label for="name">Medicine Name:</label>
-            <input type="text" id="name" name="name" required placeholder="e.g. Paracetamol">
-        </div>
-        
-        <div class="form-group">
-            <label for="dosage">Dosage:</label>
-            <input type="text" id="dosage" name="dosage" required placeholder="e.g. 1 pill, 500mg">
-        </div>
+<div class="animate-fade-in" style="max-width: 600px; margin: 0 auto;">
+    <div class="top-info" style="margin-bottom: 2.5rem;">
+        <h1 style="font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem;">New Medication</h1>
+        <p style="color: var(--text-muted);">Assign a new medicine schedule for <strong>{{ person.name }}</strong>.</p>
+    </div>
 
-        <div class="form-group">
-            <label for="total_days">Total Days to Use:</label>
-            <input type="number" id="total_days" name="total_days" required placeholder="e.g. 5" min="1" value="7">
-        </div>
-        
-        <div class="form-group">
-            <label>How many times a day?</label>
-            <select id="times_count" onchange="updateTimes()" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
-                <option value="1">1 Time a day</option>
-                <option value="2">2 Times a day</option>
-                <option value="3">3 Times a day</option>
-                <option value="4">4 Times a day</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label>Reminder Times:</label>
-            <div id="times_container" style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <input type="time" name="time_0" required style="width: auto;">
+    <div class="card">
+        <form action="{{ url_for('add_medicine_to_person', person_id=person.id) }}" method="POST">
+            <div class="form-group">
+                <label>Medicine Name</label>
+                <input type="text" name="name" required placeholder="e.g. Ibuprofen">
             </div>
-        </div>
-        
-        <div style="display: flex; gap: 10px; margin-top: 20px;">
-            <button type="submit" style="background:#2ecc71;">Add Medicine</button>
-            <a href="{{ url_for('index') }}" class="btn-edit" style="background: #95a5a6; padding: 12px 20px;">Cancel</a>
-        </div>
-    </form>
+            
+            <div class="form-group">
+                <label>Dosage</label>
+                <input type="text" name="dosage" required placeholder="e.g. 200mg tab">
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label>Duration (Days)</label>
+                    <input type="number" name="total_days" required value="7" min="1">
+                </div>
+                <div class="form-group">
+                    <label>Frequency</label>
+                    <select id="times_count" onchange="updateTimes()">
+                        <option value="1">1x Daily</option>
+                        <option value="2">2x Daily</option>
+                        <option value="3">3x Daily</option>
+                        <option value="4">4x Daily</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Reminder Times</label>
+                <div id="times_container" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <input type="time" name="time_0" required style="width: auto;">
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                <button type="submit" class="btn btn-primary" style="flex: 2;">
+                    <i data-lucide="plus"></i> Add to Schedule
+                </button>
+                <a href="{{ url_for('index') }}" class="btn btn-outline" style="flex: 1;">Cancel</a>
+            </div>
+        </form>
+    </div>
 </div>
 
 <script>
-function updateTimes() {
-    const count = parseInt(document.getElementById('times_count').value);
-    const container = document.getElementById('times_container');
-    container.innerHTML = '';
-    for(let i=0; i<count; i++) {
-        container.innerHTML += `<input type="time" name="time_${i}" required style="width: auto;">`;
+    function updateTimes() {
+        const count = parseInt(document.getElementById('times_count').value);
+        const container = document.getElementById('times_container');
+        container.innerHTML = '';
+        for(let i=0; i<count; i++) {
+            container.innerHTML += `<input type="time" name="time_${i}" required style="width: auto;">`;
+        }
     }
-}
 </script>
 {% endblock %}

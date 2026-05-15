@@ -1,50 +1,125 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="card">
-    <h2>Fever Risk Checker</h2>
-    <p style="margin-bottom: 20px;">Enter your body temperature and select your symptoms to check your risk level.</p>
-    
-    <!-- Form submits to the same page -->
-    <form method="POST">
-        <div class="form-group">
-            <label for="temperature">Body Temperature (°C):</label>
-            <input type="number" step="0.1" id="temperature" name="temperature" required placeholder="e.g. 37.5">
-        </div>
+<div class="animate-fade-in" style="max-width: 800px; margin: 0 auto;">
+    <div class="top-info" style="margin-bottom: 2.5rem;">
+        <h1 style="font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem;">Symptom Assessment</h1>
+        <p style="color: var(--text-muted);">Answer a few questions to understand your health risk. Our expert system will analyze the data instantly.</p>
+    </div>
 
-        <div class="form-group">
-            <label>Select Symptoms (if any):</label>
-            
-            <div class="checkbox-group">
-                <input type="checkbox" id="headache" name="symptoms" value="headache">
-                <label for="headache" style="font-weight:normal;">Headache</label>
+    <div class="card" style="padding: 3rem;">
+        <form method="POST" id="checkerForm">
+            <div class="form-section">
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem;">
+                    <div style="background: var(--primary-soft); color: var(--primary); padding: 0.5rem; border-radius: 8px;">
+                        <i data-lucide="thermometer"></i>
+                    </div>
+                    <h3 style="font-weight: 700;">1. Temperature</h3>
+                </div>
+                
+                <div class="form-group">
+                    <label for="temperature">Body Temperature (°F)</label>
+                    <div style="position: relative;">
+                        <input type="number" step="0.1" id="temperature" name="temperature" required placeholder="e.g. 98.6" style="padding-right: 4rem;">
+                        <span style="position: absolute; right: 1.25rem; top: 50%; transform: translateY(-50%); font-weight: 700; color: var(--text-muted);">°F</span>
+                    </div>
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;">Normal range is typically 97°F to 99°F.</p>
+                </div>
             </div>
-            
-            <div class="checkbox-group">
-                <input type="checkbox" id="fatigue" name="symptoms" value="fatigue">
-                <label for="fatigue" style="font-weight:normal;">Fatigue</label>
-            </div>
-            
-            <div class="checkbox-group">
-                <input type="checkbox" id="cough" name="symptoms" value="cough">
-                <label for="cough" style="font-weight:normal;">Cough</label>
-            </div>
-            
-            <div class="checkbox-group">
-                <input type="checkbox" id="sore_throat" name="symptoms" value="sore_throat">
-                <label for="sore_throat" style="font-weight:normal;">Sore Throat</label>
-            </div>
-        </div>
 
-        <button type="submit">Check Risk Level</button>
-    </form>
+            <div class="divider" style="margin: 2.5rem 0;"></div>
 
-    <!-- If result is set, display the output box -->
-    {% if result %}
-        <div class="result-box {{ risk_level|lower }}">
-            <h3>Risk Level: {{ risk_level }}</h3>
-            <p>{{ result }}</p>
-        </div>
-    {% endif %}
+            <div class="form-section">
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem;">
+                    <div style="background: #fef2f2; color: #ef4444; padding: 0.5rem; border-radius: 8px;">
+                        <i data-lucide="alert-triangle"></i>
+                    </div>
+                    <h3 style="font-weight: 700;">Symptoms</h3>
+                </div>
+
+                <div class="symptoms-grid" style="grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+                    <label class="checkbox-group">
+                        <input type="checkbox" name="symptoms" value="headache">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span>🤕 Headache</span>
+                        </div>
+                    </label>
+                    <label class="checkbox-group">
+                        <input type="checkbox" name="symptoms" value="fatigue">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span>😴 Fatigue</span>
+                        </div>
+                    </label>
+                    <label class="checkbox-group">
+                        <input type="checkbox" name="symptoms" value="cough">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span>🤧 Cough</span>
+                        </div>
+                    </label>
+                    <label class="checkbox-group">
+                        <input type="checkbox" name="symptoms" value="sore_throat">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span>🔴 Sore Throat</span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <div style="margin-top: 3rem;">
+                <button type="submit" class="btn btn-primary" style="width: 100%; height: 56px; font-size: 1.1rem;">
+                    Analyze Health Risk
+                </button>
+            </div>
+        </form>
+
+        {% if result %}
+            <div id="results" class="animate-fade-in" style="margin-top: 3rem; padding-top: 3rem; border-top: 2px dashed var(--border);">
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <h3 style="font-weight: 800; font-size: 1.5rem; margin-bottom: 0.5rem;">Analysis Complete</h3>
+                    <p style="color: var(--text-muted);">Based on your inputs, here is your assessment:</p>
+                </div>
+
+                <div class="risk-meter">
+                    <div class="risk-fill" id="riskFill" style="width: 0%; background: {% if risk_level == 'High' %}#ef4444{% elif risk_level == 'Medium' %}#f59e0b{% else %}#10b981{% endif %};"></div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; font-weight: 700; font-size: 0.9rem; color: var(--text-muted); margin-bottom: 2rem;">
+                    <span>NORMAL</span>
+                    <span>MODERATE</span>
+                    <span>HIGH FEVER</span>
+                </div>
+
+                <div class="card" style="background: var(--bg-secondary); border: none; text-align: center;">
+                    <h2 style="color: {% if risk_level == 'High' %}#ef4444{% elif risk_level == 'Medium' %}#f59e0b{% else %}#10b981{% endif %}; font-weight: 800; margin-bottom: 1rem;">
+                        {{ risk_level }} Risk
+                    </h2>
+                    <p style="font-size: 1.1rem; line-height: 1.6;">{{ result }}</p>
+                </div>
+                
+                <div style="margin-top: 2rem; text-align: center;">
+                    <p style="font-size: 0.85rem; color: var(--text-muted);">
+                        <i data-lucide="info" style="width: 14px; vertical-align: middle;"></i> 
+                        Disclaimer: This is an automated assessment and not a professional medical diagnosis.
+                    </p>
+                </div>
+            </div>
+
+            <script>
+                // Animate risk meter
+                window.onload = () => {
+                    const fill = document.getElementById('riskFill');
+                    const level = "{{ risk_level }}";
+                    let target = 0;
+                    if (level === 'High') target = 90;
+                    else if (level === 'Medium') target = 50;
+                    else target = 15;
+                    
+                    setTimeout(() => {
+                        fill.style.width = target + '%';
+                    }, 100);
+                }
+            </script>
+        {% endif %}
+    </div>
 </div>
 {% endblock %}

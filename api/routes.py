@@ -127,7 +127,7 @@ def register_routes(app):
 
     @app.route('/fever_checker', methods=['GET', 'POST'])
     def fever_checker():
-        """Route for the Fever Risk Checker feature."""
+        """Route for the Fever Risk Checker feature using Fahrenheit."""
         result = None
         risk_level = None
         
@@ -136,26 +136,27 @@ def register_routes(app):
                 temperature = float(request.form.get('temperature', 0))
                 symptoms = request.form.getlist('symptoms')
                 
-                if temperature >= 39.0:
+                # Logic updated for Fahrenheit thresholds
+                if temperature >= 102.2:
                     risk_level = "High"
-                    result = "Your temperature is quite high. Please consult a doctor immediately."
-                elif temperature >= 38.0:
+                    result = "Your temperature is quite high (" + str(temperature) + "°F). Please consult a doctor immediately."
+                elif temperature >= 100.4:
                     if len(symptoms) >= 2:
                         risk_level = "High"
-                        result = "You have a moderate fever with multiple symptoms. You should see a doctor."
+                        result = "You have a moderate fever (" + str(temperature) + "°F) with multiple symptoms. You should see a doctor."
                     else:
                         risk_level = "Medium"
-                        result = "You have a moderate fever. Rest and monitor your symptoms."
-                elif temperature >= 37.5:
+                        result = "You have a moderate fever (" + str(temperature) + "°F). Rest and monitor your symptoms."
+                elif temperature >= 99.5:
                     risk_level = "Medium"
-                    result = "You have a mild fever. Drink plenty of fluids."
+                    result = "You have a mild fever (" + str(temperature) + "°F). Drink plenty of fluids."
                 else:
                     if len(symptoms) >= 3:
                         risk_level = "Medium"
-                        result = "Your temperature is normal, but you have multiple symptoms. Take care."
+                        result = "Your temperature is normal (" + str(temperature) + "°F), but you have multiple symptoms. Take care."
                     else:
                         risk_level = "Low"
-                        result = "Your temperature is normal and you have few or no symptoms."
+                        result = "Your temperature is normal (" + str(temperature) + "°F) and you have few or no symptoms."
                         
             except ValueError:
                 flash('Please enter a valid number for temperature.', 'error')
