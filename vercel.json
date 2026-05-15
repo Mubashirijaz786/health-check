@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "framework": "django",
   "builds": [
     {
       "src": "api/app.py",
