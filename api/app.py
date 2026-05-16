@@ -17,5 +17,16 @@ if os.environ.get('VERCEL'):
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 
+# Auto-run migrations on Vercel startup
+if os.environ.get('VERCEL'):
+    from django.core.management import call_command
+    from django.db import connection
+    try:
+        # This will run migrations automatically on the live server
+        app = get_wsgi_application()
+        call_command('migrate', interactive=False)
+    except Exception as e:
+        print(f"Migration error: {e}")
+
 # This is the WSGI application that Vercel will use
 app = get_wsgi_application()
