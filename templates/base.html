@@ -1,6 +1,7 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,33 +10,42 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body onclick="enableAudio()">
 
     <div class="app-shell">
         <!-- Sidebar -->
         <aside class="sidebar">
             <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 4rem; padding-left: 0.5rem;">
-                <div style="width: 40px; height: 40px; border-radius: 10px; background: #2563eb; display: flex; align-items: center; justify-content: center; color: white;">
+                <div
+                    style="width: 40px; height: 40px; border-radius: 10px; background: #2563eb; display: flex; align-items: center; justify-content: center; color: white;">
                     <i data-lucide="heart"></i>
                 </div>
-                <span style="font-family: 'Outfit'; font-size: 1.4rem; font-weight: 500; color: white;">HEALTH <span style="color: #2563eb;">SYSTEM</span></span>
+                <span style="font-family: 'Outfit'; font-size: 1.4rem; font-weight: 500; color: white;">HEALTH <span
+                        style="color: #2563eb;">SYSTEM</span></span>
             </div>
 
             <nav style="flex: 1;">
-                <p style="color: var(--text-dim); font-size: 0.7rem; font-weight: 500; text-transform: uppercase; margin: 2rem 0 1rem 1rem;">Menu</p>
-                <a href="{% url 'index' %}" class="nav-link {% if request.resolver_match.url_name == 'index' %}active{% endif %}">
+                <p
+                    style="color: var(--text-dim); font-size: 0.7rem; font-weight: 500; text-transform: uppercase; margin: 2rem 0 1rem 1rem;">
+                    Menu</p>
+                <a href="{% url 'index' %}"
+                    class="nav-link {% if request.resolver_match.url_name == 'index' %}active{% endif %}">
                     <i data-lucide="timer"></i> <span class="nav-label">Medicine Timer</span>
                 </a>
-                <a href="{% url 'analysis_hub' %}" class="nav-link {% if 'checkers/' in request.path or request.resolver_match.url_name == 'analysis_hub' %}active{% endif %}">
+                <a href="{% url 'analysis_hub' %}"
+                    class="nav-link {% if 'checkers/' in request.path or request.resolver_match.url_name == 'analysis_hub' %}active{% endif %}">
                     <i data-lucide="activity"></i> <span class="nav-label">Health Checkers</span>
                 </a>
-                <a href="{% url 'hospital_finder' %}" class="nav-link {% if request.resolver_match.url_name == 'hospital_finder' %}active{% endif %}">
+                <a href="{% url 'hospital_finder' %}"
+                    class="nav-link {% if request.resolver_match.url_name == 'hospital_finder' %}active{% endif %}">
                     <i data-lucide="search"></i> <span class="nav-label">Find Hospital</span>
                 </a>
             </nav>
 
             <div style="margin-top: auto; padding: 1rem; text-align: center;">
-                <div id="soundIndicator" style="font-size: 0.6rem; color: #ef4444; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 0.4rem; background: rgba(239, 68, 68, 0.1); padding: 0.5rem; border-radius: 8px;">
+                <div id="soundIndicator"
+                    style="font-size: 0.6rem; color: #ef4444; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 0.4rem; background: rgba(239, 68, 68, 0.1); padding: 0.5rem; border-radius: 8px;">
                     <i data-lucide="volume-x" style="width: 12px;"></i> SOUND MUTED
                 </div>
             </div>
@@ -44,19 +54,6 @@
         <!-- Main Content -->
         <main class="main-content">
             <div class="content-container">
-                <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4rem;">
-                    <div>
-                        <p style="font-size: 0.75rem; font-weight: 500; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.1em;">Smart Care Monitor</p>
-                        <h2 style="font-size: 1.6rem; margin-top: 0.25rem; font-weight: 500; color: white;">{{ request.resolver_match.url_name|title }}</h2>
-                    </div>
-                    
-                    <div style="display: flex; align-items: center; gap: 1.5rem;">
-                        <span id="auraClock" style="font-weight: 500; font-size: 1.2rem; color: white; font-variant-numeric: tabular-nums; opacity: 0.8;">00:00:00</span>
-                        <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; color: white; border: 1px solid var(--border-glass);">
-                            <i data-lucide="user" style="width: 18px;"></i>
-                        </div>
-                    </div>
-                </header>
 
                 <div class="animate-fade-in">
                     {% block content %}{% endblock %}
@@ -66,14 +63,20 @@
     </div>
 
     <!-- Medicine Alert Modal -->
-    <div id="auraAlertModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); backdrop-filter:blur(20px); z-index:10000; align-items:center; justify-content:center;">
-        <div class="glass-card" style="max-width:400px; width:90%; padding:3rem; text-align:center; border: 1px solid var(--primary);">
-            <div style="width: 80px; height: 80px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; margin: 0 auto 2.5rem; animation: pulse 1.5s infinite;">
+    <div id="auraAlertModal"
+        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); backdrop-filter:blur(20px); z-index:10000; align-items:center; justify-content:center;">
+        <div class="glass-card"
+            style="max-width:400px; width:90%; padding:3rem; text-align:center; border: 1px solid var(--primary);">
+            <div
+                style="width: 80px; height: 80px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; margin: 0 auto 2.5rem; animation: pulse 1.5s infinite;">
                 <i data-lucide="bell" style="width: 40px; height: 40px;"></i>
             </div>
             <h2 style="font-size: 2rem; margin-bottom: 1rem; color: white; font-weight: 500;">Medicine Reminder</h2>
-            <div id="auraAlertContent" style="color:var(--text-secondary); margin-bottom:3rem; font-size: 1.1rem; line-height: 1.6;"></div>
-            <button onclick="closeAuraAlert()" class="btn-premium btn-primary" style="width:100%; height: 60px; font-size: 1rem; border-radius: 12px; font-weight: 500;">OK, DONE</button>
+            <div id="auraAlertContent"
+                style="color:var(--text-secondary); margin-bottom:3rem; font-size: 1.1rem; line-height: 1.6;"></div>
+            <button onclick="closeAuraAlert()" class="btn-premium btn-primary"
+                style="width:100%; height: 60px; font-size: 1rem; border-radius: 12px; font-weight: 500;">OK,
+                DONE</button>
         </div>
     </div>
 
@@ -110,12 +113,12 @@
             const sound = document.getElementById('auraAlertSound');
             document.getElementById('auraAlertContent').innerHTML = msg;
             modal.style.display = 'flex';
-            
+
             // Re-try enabling if not enabled
             if (!audioEnabled) {
                 enableAudio();
             }
-            
+
             sound.play().catch(e => console.log("Sound error: ", e));
         }
 
@@ -141,13 +144,13 @@
             if (window.medicineData) {
                 const now = new Date();
                 const currentTime = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
-                
+
                 window.medicineData.forEach(person => {
                     person.medicines.forEach(med => {
                         med.times.forEach(time => {
                             let formattedTime = time;
                             if (time.length === 4) formattedTime = "0" + time;
-                            
+
                             const alertKey = `${person.name}-${med.name}-${formattedTime}-${now.toDateString()}`;
                             if (formattedTime === currentTime && !activeAlerts.has(alertKey)) {
                                 triggerAuraAlert(`Patient: <b style="color:white; font-weight:500;">${person.name}</b><br>Medicine: <b style="color:var(--primary); font-weight:500;">${med.name}</b>`);
@@ -161,4 +164,5 @@
         setInterval(checkReminders, 5000);
     </script>
 </body>
+
 </html>
