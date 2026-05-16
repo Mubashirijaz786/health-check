@@ -2,14 +2,11 @@ import os
 import sys
 from django.core.wsgi import get_wsgi_application
 
-# Add the project root and the health_helper_app directory to the Python path
-current_dir = os.path.dirname(os.path.abspath(__file__))
-parent_dir = os.path.dirname(current_dir)
-root_dir = os.path.dirname(parent_dir)
-
-for d in [parent_dir, root_dir]:
-    if d not in sys.path:
-        sys.path.append(d)
+# Add the project root to the Python path
+# This file is in health_helper_app/api/app.py, so the root is one level up
+path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if path not in sys.path:
+    sys.path.append(path)
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 

@@ -76,6 +76,9 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+
+# Use cookie-based sessions for Vercel (read-only filesystem)
+SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
