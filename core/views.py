@@ -255,10 +255,16 @@ def add_person(request):
 
 def delete_person(request, person_id):
     Person.objects.filter(id=person_id).delete()
+    messages.success(request, "Person deleted successfully.")
     return redirect('index')
 
 def add_medicine(request, person_id):
-    p = get_object_or_404(Person, id=person_id)
+    try:
+        p = Person.objects.get(id=person_id)
+    except Person.DoesNotExist:
+        messages.error(request, "Patient not found. They may have been cleared from temporary storage.")
+        return redirect('index')
+        
     if request.method == 'POST':
         times = [v for k,v in request.POST.items() if k.startswith('time_')]
         Medicine.objects.create(person=p, name=request.POST.get('name'), dosage=request.POST.get('dosage'), total_days=request.POST.get('total_days'), times=times)
@@ -266,7 +272,12 @@ def add_medicine(request, person_id):
     return render(request, 'add_medicine_to_person.html', {'person': p})
 
 def edit_medicine(request, person_id, medicine_id):
-    m = get_object_or_404(Medicine, id=medicine_id)
+    try:
+        m = Medicine.objects.get(id=medicine_id)
+    except Medicine.DoesNotExist:
+        messages.error(request, "Medicine or Patient not found.")
+        return redirect('index')
+
     if request.method == 'POST':
         m.name, m.dosage, m.total_days = request.POST.get('name'), request.POST.get('dosage'), request.POST.get('total_days')
         m.times = [v for k,v in request.POST.items() if k.startswith('time_')]
