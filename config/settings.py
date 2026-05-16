@@ -58,18 +58,19 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-# Database
-if os.environ.get('VERCEL'):
-    db_path = '/tmp/db.sqlite3'
-else:
-    db_path = os.path.join(BASE_DIR, 'db.sqlite3')
+import dj_database_url
 
+# Database
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': db_path,
-    }
+    'default': dj_database_url.config(
+        default=f"sqlite:///{os.path.join(BASE_DIR, 'db.sqlite3')}",
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
 }
+
+if os.environ.get('POSTGRES_URL'):
+    DATABASES['default'] = dj_database_url.parse(os.environ.get('POSTGRES_URL'))
 
 # Internationalization
 LANGUAGE_CODE = 'en-us'
