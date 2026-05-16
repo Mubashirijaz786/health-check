@@ -103,41 +103,41 @@
         }
         setInterval(updateClock, 1000); updateClock();
 
+        let activeAlerts = new Set();
         let audioEnabled = false;
+
         function enableAudio() {
-            if (audioEnabled) return;
-            const sound = document.getElementById('auraAlertSound');
-            sound.play().then(() => {
-                sound.pause();
-                sound.currentTime = 0;
-                audioEnabled = true;
-                const ind = document.getElementById('soundIndicator');
-                ind.style.color = '#10b981';
-                ind.style.background = 'rgba(16, 185, 129, 0.1)';
-                ind.innerHTML = '<i data-lucide="volume-2" style="width: 12px;"></i> SOUND ACTIVE';
-                lucide.createIcons();
-                console.log("Audio Enabled Globally");
-            }).catch(e => console.log("Audio blocked"));
+            if (!audioEnabled) {
+                const sound = document.getElementById('auraAlertSound');
+                sound.play().then(() => {
+                    sound.pause();
+                    sound.currentTime = 0;
+                    audioEnabled = true;
+                    document.getElementById('soundIndicator').style.display = 'none';
+                }).catch(e => console.log("Audio activation failed"));
+            }
         }
 
-        function triggerAuraAlert(msg) {
+        function triggerAuraAlert(messages) {
             const modal = document.getElementById('auraAlertModal');
             const sound = document.getElementById('auraAlertSound');
-            document.getElementById('auraAlertContent').innerHTML = msg;
+            
+            // Build a combined message for multiple patients
+            let combinedMsg = messages.join('<div style="margin: 1.5rem 0; border-top: 1px solid rgba(255,255,255,0.1);"></div>');
+            document.getElementById('auraAlertContent').innerHTML = combinedMsg;
             modal.style.display = 'flex';
-
-            // Re-try enabling if not enabled
-            if (!audioEnabled) {
-                enableAudio();
+            
+            if (audioEnabled) {
+                sound.play().catch(e => console.log("Sound error: ", e));
             }
-
-            sound.play().catch(e => console.log("Sound error: ", e));
         }
 
         function closeAuraAlert() {
-            document.getElementById('auraAlertModal').style.display = 'none';
-            document.getElementById('auraAlertSound').pause();
-            document.getElementById('auraAlertSound').currentTime = 0;
+            const modal = document.getElementById('auraAlertModal');
+            const sound = document.getElementById('auraAlertSound');
+            modal.style.display = 'none';
+            sound.pause();
+            sound.currentTime = 0;
         }
 
         window.medicineData = [];
@@ -151,29 +151,35 @@
         syncMedicineData();
         setInterval(syncMedicineData, 30000);
 
-        const activeAlerts = new Set();
         function checkReminders() {
             if (window.medicineData) {
                 const now = new Date();
                 const currentTime = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
-
+                let newMatches = [];
+                
                 window.medicineData.forEach(person => {
                     person.medicines.forEach(med => {
                         med.times.forEach(time => {
                             let formattedTime = time;
                             if (time.length === 4) formattedTime = "0" + time;
-
+                            
                             const alertKey = `${person.name}-${med.name}-${formattedTime}-${now.toDateString()}`;
                             if (formattedTime === currentTime && !activeAlerts.has(alertKey)) {
-                                triggerAuraAlert(`Patient: <b style="color:white; font-weight:500;">${person.name}</b><br>Medicine: <b style="color:var(--primary); font-weight:500;">${med.name}</b>`);
+                                newMatches.push(`Patient: <b style="color:white; font-weight:500;">${person.name}</b><br>Medicine: <b style="color:var(--primary); font-weight:500;">${med.name}</b>`);
                                 activeAlerts.add(alertKey);
                             }
                         });
                     });
                 });
+
+                if (newMatches.length > 0) {
+                    triggerAuraAlert(newMatches);
+                }
             }
         }
-        setInterval(checkReminders, 5000);
+
+        // Check every 10 seconds
+        setInterval(checkReminders, 10000);
     </script>
 </body>
 
