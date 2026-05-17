@@ -28,7 +28,9 @@
         <div class="form-group" style="margin-top: 2.5rem;">
             <label class="form-label">Reminder Times</label>
             <div id="timeStream" style="display: flex; flex-direction: column; gap: 1rem;">
-                <input type="time" name="time_1" required class="input-premium" style="width: auto;">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <input type="time" name="time_1" required class="input-premium" style="width: auto;">
+                </div>
             </div>
             <button type="button" onclick="addTime()" style="background:none; border:none; color:var(--primary); font-weight:800; margin-top:1.5rem; cursor:pointer; font-size:0.8rem;">+ ADD ANOTHER TIME</button>
         </div>
@@ -44,10 +46,14 @@
     let tCount = 1;
     function addTime() {
         tCount++;
-        const i = document.createElement('input');
-        i.type = 'time'; i.name = 'time_' + tCount; i.className = 'input-premium';
-        i.style = "width: auto; margin-top: 0.5rem;";
-        document.getElementById('timeStream').appendChild(i);
+        const div = document.createElement('div');
+        div.style = "display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem;";
+        div.innerHTML = `
+            <input type="time" name="time_${tCount}" required class="input-premium" style="width: auto;">
+            <button type="button" onclick="this.parentElement.remove()" style="background:none; border:none; color:var(--danger); cursor:pointer; padding:0.5rem;"><i data-lucide="minus-circle" style="width:18px;"></i></button>
+        `;
+        document.getElementById('timeStream').appendChild(div);
+        if (typeof lucide !== 'undefined') lucide.createIcons();
     }
 </script>
 {% endblock %}
