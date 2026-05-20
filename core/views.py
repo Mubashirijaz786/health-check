@@ -61,16 +61,16 @@ def heart_risk_checker(request):
 def diabetes_risk_checker(request):
     result, risk, score = None, "Low", 0
     if request.method == 'POST':
-        sugar = float(request.POST.get('sugar', 100))
+        glucose = float(request.POST.get('glucose', 0))
         age = int(request.POST.get('age', 0))
+        bmi = float(request.POST.get('bmi', 0))
         family_h = request.POST.get('family_history') == 'yes'
-        thirst = request.POST.get('thirst') == 'yes'
-        fatigue = request.POST.get('fatigue') == 'yes'
+        thirst = request.POST.get('frequent_thirst') == 'yes'
         
-        if sugar > 126: score += 40
+        if glucose > 126: score += 35
+        if bmi > 25: score += 15
         if family_h: score += 20
         if thirst: score += 15
-        if fatigue: score += 10
         if age > 45: score += 15
         
         if score >= 50: risk, result = "High", "Probable diabetic condition. Fasting glucose test recommended."
@@ -82,15 +82,14 @@ def dengue_risk_checker(request):
     result, risk, severity = None, "Low", 0
     if request.method == 'POST':
         fever = request.POST.get('fever') == 'yes'
-        body_pain = request.POST.get('body_pain') == 'yes'
-        rash = request.POST.get('rash') == 'yes'
+        bleeding = request.POST.get('bleeding') == 'yes'
+        joint_pain = request.POST.get('joint_pain') == 'yes'
         platelets = int(request.POST.get('platelets', 250000))
-        vomiting = request.POST.get('vomiting') == 'yes'
         
-        if fever and body_pain: severity += 30
-        if rash: severity += 20
+        if fever: severity += 20
+        if bleeding: severity += 30
+        if joint_pain: severity += 20
         if platelets < 100000: severity += 40
-        if vomiting: severity += 10
         
         if severity >= 60: risk, result = "Severe", "Emergency: High probability of Dengue Hemorrhagic Fever. Hospitalize immediately."
         elif severity >= 30: risk, result = "Moderate", "Possible Dengue. Complete blood count (CBC) recommended."
