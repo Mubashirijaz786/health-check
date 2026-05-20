@@ -66,7 +66,20 @@ DATABASES = {
     }
 }
 
-if os.environ.get('POSTGRES_URL'):
+if os.environ.get('VERCEL'):
+    if os.environ.get('POSTGRES_URL'):
+        try:
+            import dj_database_url
+            DATABASES['default'] = dj_database_url.parse(os.environ.get('POSTGRES_URL'))
+        except ImportError:
+            pass
+    else:
+        # Fallback to writable /tmp directory on Vercel for SQLite
+        DATABASES['default'] = {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': '/tmp/db.sqlite3',
+        }
+elif os.environ.get('POSTGRES_URL'):
     try:
         import dj_database_url
         DATABASES['default'] = dj_database_url.parse(os.environ.get('POSTGRES_URL'))
